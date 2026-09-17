@@ -84,44 +84,45 @@ export function StickyMasterclassBar() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas/95 py-3.5 shadow-lg backdrop-blur-md"
+            className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas/95 py-2.5 sm:py-3.5 shadow-lg backdrop-blur-md"
           >
-            <div className="page-gutter mx-auto flex max-w-[1152px] items-center justify-between gap-4">
+            <div className="page-gutter mx-auto flex max-w-[1152px] items-center justify-between gap-3 sm:gap-4">
               {/* Left Column: Eyebrow, Title, and Subtitle */}
-              <div className="flex flex-col justify-center">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-gold-deep">
+              <div className="flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-gold-deep shrink-0">
                     {masterclassConfig.badge}
                   </span>
-                  <span className="text-ink-low/40" aria-hidden="true">
+                  <span className="text-ink-low/40 hidden xs:inline" aria-hidden="true">
                     •
                   </span>
-                  <h4 className="text-[15px] font-semibold text-navy sm:text-base">
+                  <h4 className="truncate text-xs font-semibold text-navy xs:text-[14px] sm:text-base">
                     {masterclassConfig.title}
                   </h4>
                 </div>
-                <p className="mt-0.5 text-xs text-ink-mid sm:text-[13px]">
+                <p className="mt-0.5 truncate text-[11px] text-ink-mid sm:text-[13px]">
                   {masterclassConfig.subtitle}
                 </p>
               </div>
 
               {/* Right Column: CTA Button and Dismiss */}
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                 <button
                   type="button"
                   onClick={handleCtaClick}
-                  className={`${buttonStyles.primary} !h-10 !px-5 !text-sm font-semibold shadow-xs`}
+                  className={`${buttonStyles.primary} !h-9 !px-3.5 !text-xs sm:!h-10 sm:!px-5 sm:!text-sm font-semibold shadow-xs`}
                 >
-                  {masterclassConfig.buttonText}
+                  <span className="sm:hidden">Register</span>
+                  <span className="hidden sm:inline">{masterclassConfig.buttonText}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsDismissed(true)}
                   aria-label="Dismiss banner"
-                  className="flex size-8 items-center justify-center rounded-md text-ink-low transition-colors hover:bg-canvas-alt hover:text-navy"
+                  className="flex size-7 sm:size-8 items-center justify-center rounded-md text-ink-low transition-colors hover:bg-canvas-alt hover:text-navy"
                 >
-                  <X className="size-4" />
+                  <X className="size-3.5 sm:size-4" />
                 </button>
               </div>
             </div>
