@@ -1,68 +1,288 @@
-import { Eyebrow, H2, Reveal, SectionShell } from "./primitives";
-import { Quote, Star } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Maximize2, Pause, Play, X } from "lucide-react";
+import { Reveal, SectionShell } from "./primitives";
 
-export const testimonials = [
+import christopherChatImg from "@/assets/wall-of-love/review-christopher-chat.png";
+import andresG2Img from "@/assets/wall-of-love/review-andres-g2.jpg";
+import saeeLinkedinImg from "@/assets/wall-of-love/review-saee-linkedin.png";
+import prathameshLinkedinImg from "@/assets/wall-of-love/review-prathamesh-linkedin.jpg";
+import mayurLinkedinImg from "@/assets/wall-of-love/review-mayur-linkedin.jpg";
+
+export const reviews = [
   {
-    name: "Vikram R.",
-    role: "Senior Backend Engineer",
-    company: "Bengaluru Workshop Attendee",
-    text: "Building an agent is easy with tutorials, but making it clear customer security review, audit logs, and token limits is where 99% fail. The Lyzr FDE session broke down the exact architecture needed.",
-    rating: 5,
+    id: "christopher-chat",
+    title: "Christopher Kunnur - Live Session Feedback",
+    author: "Christopher Kunnur",
+    role: "Live Workshop Participant",
+    source: "Live Chat",
+    image: christopherChatImg,
   },
   {
-    name: "Ananya M.",
-    role: "Enterprise Solutions Architect",
-    company: "Hyderabad Clinic Attendee",
-    text: "The graph RAG and eval framework taught here saved us at least 6 weeks of engineering trial-and-error on our banking client rollout. Extremely high signal-to-noise ratio.",
-    rating: 5,
+    id: "andres-g2",
+    title: "Andres G. - G2 Review",
+    author: "Andres G.",
+    role: "Head of Data at Dentsu Aegis Network",
+    source: "G2 Review",
+    image: andresG2Img,
   },
   {
-    name: "Karthik S.",
-    role: "Full-Stack Dev -> Forward Deployed",
-    company: "Pune Field Session",
-    text: "The shift from building toy LLM wrappers to production multi-agent workflows with state persistence was eye-opening. Best investment in my engineering career this year.",
-    rating: 5,
+    id: "saee-linkedin",
+    title: "Saee Kumbhar - Lyzr Agent Labs",
+    author: "Saee Kumbhar",
+    role: "AI Builder & Engineer",
+    source: "LinkedIn",
+    image: saeeLinkedinImg,
+  },
+  {
+    id: "prathamesh-linkedin",
+    title: "Prathamesh Patil - Lyzr Workshop",
+    author: "Prathamesh Patil",
+    role: "Full-Stack Engineer",
+    source: "LinkedIn",
+    image: prathameshLinkedinImg,
+  },
+  {
+    id: "mayur-linkedin",
+    title: "Mayur Shinde - Lyzr Agent Labs",
+    author: "Mayur Shinde",
+    role: "Campus Ambassador at Unstop",
+    source: "LinkedIn",
+    image: mayurLinkedinImg,
   },
 ];
 
 export function WallOfLove() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [tempPause, setTempPause] = useState(false);
+  const tempPauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Overall effective pause state
+  const isPaused = isManuallyPaused || isHovered || tempPause;
+
+  // 4 sets of reviews for seamless infinite right-to-left scrolling
+  const multiReviews = [...reviews, ...reviews, ...reviews, ...reviews];
+
+  // Set initial scroll offset to allow bi-directional scrolling
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const singleSetWidth = el.scrollWidth / 4;
+    el.scrollLeft = singleSetWidth;
+  }, []);
+
+  // Continuous right-to-left auto-scroll
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let animId: number;
+    let lastTime = performance.now();
+
+    const step = (time: number) => {
+      const delta = time - lastTime;
+      lastTime = time;
+
+      if (!isPaused && el) {
+        // ~45px/second smooth right-to-left scroll speed
+        const speed = 0.045;
+        el.scrollLeft += delta * speed;
+
+        const singleSetWidth = el.scrollWidth / 4;
+        if (el.scrollLeft >= singleSetWidth * 2) {
+          el.scrollLeft -= singleSetWidth;
+        }
+      }
+
+      animId = requestAnimationFrame(step);
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [isPaused]);
+
+  // Pause on manual click so the user can read the card they just scrolled to
+  const triggerStepPause = () => {
+    setTempPause(true);
+    if (tempPauseTimerRef.current) clearTimeout(tempPauseTimerRef.current);
+    tempPauseTimerRef.current = setTimeout(() => {
+      setTempPause(false);
+    }, 4500);
+  };
+
+  // Measure card width dynamically for responsive step navigation
+  const getStepWidth = () => {
+    const el = scrollRef.current;
+    if (!el) return 360;
+    const card = el.querySelector<HTMLElement>("[data-review-card]");
+    return card ? card.offsetWidth + 20 : 360;
+  };
+
+  // "Go and stop" to the previous review
+  const scrollPrev = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    triggerStepPause();
+    const singleSetWidth = el.scrollWidth / 4;
+    if (el.scrollLeft <= singleSetWidth) {
+      el.scrollLeft += singleSetWidth;
+    }
+    el.scrollBy({ left: -getStepWidth(), behavior: "smooth" });
+  };
+
+  // "Go and stop" to the next review
+  const scrollNext = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    triggerStepPause();
+    const singleSetWidth = el.scrollWidth / 4;
+    if (el.scrollLeft >= singleSetWidth * 2) {
+      el.scrollLeft -= singleSetWidth;
+    }
+    el.scrollBy({ left: getStepWidth(), behavior: "smooth" });
+  };
+
+  // Toggle continuous auto-scroll play/pause
+  const togglePlayPause = () => {
+    if (isManuallyPaused) {
+      setIsManuallyPaused(false);
+      setTempPause(false);
+    } else {
+      setIsManuallyPaused(true);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedImage(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (tempPauseTimerRef.current) clearTimeout(tempPauseTimerRef.current);
+    };
+  }, []);
+
   return (
-    <SectionShell id="testimonials" className="bg-canvas-alt">
-      <Reveal className="max-w-[850px]">
-        <Eyebrow>Wall of Love</Eyebrow>
-        <H2>Trusted by builders from workshops and live field sessions.</H2>
+    <SectionShell id="testimonials" className="bg-[#0a0b0e] text-canvas">
+      {/* Header with requested title and navigation controls */}
+      <Reveal>
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+          <div className="max-w-[780px]">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+              Wall of Love
+            </p>
+            <h2 className="mt-3 text-h2-m font-semibold tracking-tight text-white md:text-h2">
+              Trusted by builders from workshops and live field sessions.
+            </h2>
+          </div>
+
+          {/* Navigation Controls: Prev (go & stop), Play/Pause, Next (go & stop) */}
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={scrollPrev}
+              aria-label="Previous review (step and pause)"
+              title="Previous review"
+              className="flex size-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition-all hover:border-white/35 hover:bg-white/15 active:scale-95"
+            >
+              <ArrowLeft className="size-5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={togglePlayPause}
+              aria-label={isManuallyPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
+              title={isManuallyPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
+              className="flex size-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition-all hover:border-white/35 hover:bg-white/15 active:scale-95"
+            >
+              {isManuallyPaused ? (
+                <Play className="size-4 fill-current ml-0.5" />
+              ) : (
+                <Pause className="size-4 fill-current" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={scrollNext}
+              aria-label="Next review (step and pause)"
+              title="Next review"
+              className="flex size-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white transition-all hover:border-white/35 hover:bg-white/15 active:scale-95"
+            >
+              <ArrowRight className="size-5" />
+            </button>
+          </div>
+        </div>
       </Reveal>
 
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t, i) => (
-          <Reveal key={t.name} delay={i * 0.06}>
-            <div className="flex h-full flex-col justify-between rounded-card border border-line bg-white p-7 shadow-xs">
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-1 text-gold-deep">
-                    {[...Array(t.rating)].map((_, idx) => (
-                      <Star key={idx} className="size-4 fill-gold-deep text-gold-deep" />
-                    ))}
-                  </div>
-                  <Quote className="size-5 text-ink-low/40" />
-                </div>
-
-                <p className="mt-5 text-[14.5px] leading-relaxed text-navy">
-                  "{t.text}"
-                </p>
+      {/* Moving Right-to-Left Continuous Track */}
+      <Reveal delay={0.08}>
+        <div
+          ref={scrollRef}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchEnd={() => {
+            setTimeout(() => setIsHovered(false), 2200);
+          }}
+          className="mt-12 flex gap-5 overflow-x-auto py-2 select-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          style={{ scrollBehavior: "auto" }}
+        >
+          {multiReviews.map((review, i) => (
+            <div
+              key={`${review.id}-${i}`}
+              data-review-card
+              onClick={() => setSelectedImage(review.image)}
+              className="group relative w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#12141a] shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-white/30 hover:shadow-2xl sm:w-[320px] md:w-[340px]"
+            >
+              <div className="relative aspect-[819/1024] w-full overflow-hidden bg-[#181a22]">
+                <img
+                  src={review.image}
+                  alt={review.title}
+                  loading="lazy"
+                  draggable={false}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                />
               </div>
 
-              <div className="mt-6 border-t border-line pt-4">
-                <p className="font-semibold text-navy text-[15px]">{t.name}</p>
-                <p className="text-xs text-ink-mid font-mono mt-0.5">{t.role}</p>
-                <span className="mt-2 inline-block rounded bg-canvas px-2 py-0.5 font-mono text-[11px] text-ter-600">
-                  {t.company}
-                </span>
+              {/* Hover expand badge */}
+              <div className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/60 text-white/80 opacity-0 backdrop-blur-xs transition-opacity duration-200 group-hover:opacity-100">
+                <Maximize2 className="size-4" />
               </div>
             </div>
-          </Reveal>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Reveal>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative max-h-[92vh] max-w-[92vw] overflow-hidden rounded-2xl border border-white/20 bg-[#111218] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedImage(null)}
+              className="absolute right-3 top-3 z-10 flex size-9 items-center justify-center rounded-full bg-black/70 text-white transition-colors hover:bg-black"
+              aria-label="Close modal"
+            >
+              <X className="size-5" />
+            </button>
+            <img
+              src={selectedImage}
+              alt="Review full preview"
+              className="max-h-[85vh] w-auto max-w-full object-contain"
+            />
+          </div>
+        </div>
+      )}
     </SectionShell>
   );
 }

@@ -7,7 +7,7 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <SectionShell id="faq" className="bg-canvas">
+    <SectionShell id="faq" className="bg-canvas-alt">
       <Reveal className="max-w-[720px]">
         <Eyebrow>Questions</Eyebrow>
         <H2>Before you apply.</H2>

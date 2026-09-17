@@ -36,7 +36,7 @@ export const valuePillars = [
 
 export function ValueStack() {
   return (
-    <SectionShell id="valuestack" className="bg-canvas-alt">
+    <SectionShell id="valuestack" className="bg-canvas">
       <Reveal className="max-w-[850px]">
         <Eyebrow>The Fellowship Value Stack</Eyebrow>
         <H2>Everything you need to become the engineer enterprises hire first.</H2>

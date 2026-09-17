@@ -1,70 +1,53 @@
-import { Link } from "@tanstack/react-router";
 import { marqueeLogos } from "@/lib/fde-data";
-import heroSummit from "@/assets/hero-summit.png";
+import heroFinalCropped from "@/assets/hero-final-cropped.jpg";
 import { PartnerLogo } from "./PartnerLogo";
-import { buttonStyles, Reveal } from "./primitives";
+import { Reveal } from "./primitives";
 
 export function Hero() {
   return (
     <section id="top" className="relative w-full bg-surface pt-[72px] text-text-primary">
-      {/* Hero Banner: cropped 10% from the bottom, lifting content and framing the climbers */}
-      <div className="relative w-full overflow-hidden min-h-[490px] sm:min-h-[540px] md:aspect-[18/9] md:min-h-[500px]">
-        {/* 4K image: top-anchored and sized to cut off the bottom 10% */}
+      {/* Hero Banner sized to fit perfectly within the first fold (visible down to the logos) */}
+      <div className="relative w-full overflow-hidden h-[calc(100svh-72px)] min-h-[500px] max-h-[840px] bg-black">
+        {/* Full resolution runners image cropped from top */}
         <img
-          src={heroSummit}
-          alt="Climbers scaling a mountain summit together"
+          src={heroFinalCropped}
+          alt="1M+ Forward Deployed Engineers needed by 2030"
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-x-0 top-0 h-[111%] w-full object-cover object-top select-none"
+          className="absolute inset-0 h-full w-full object-cover object-center select-none"
         />
 
-        {/* Content placed over left side negative space, moved slightly up */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] items-center px-6 pb-24 pt-4 md:px-10 md:pb-28 md:pt-6 lg:px-14">
-          <div className="grid w-full items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-            <Reveal className="max-w-[640px]">
-              {/* Eyebrow badge in white rounded rectangle / pill for crisp visibility */}
-              <div className="inline-flex items-center rounded-full border border-white/80 bg-white/90 px-3.5 py-1.5 shadow-sm backdrop-blur-md">
-                <p className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-ter-600 sm:text-[13px]">
-                  THE FDE COLLECTIVE · AN INITIATIVE BY LYZR
-                </p>
-              </div>
-
-              {/* Bold, high-contrast headline */}
-              <h1 className="mt-4 text-[2.5rem] font-bold leading-[1.08] tracking-[-0.035em] text-esp-950 sm:text-[3.2rem] lg:text-[4rem]">
-                Helping 1M+ developers become forward-deployed engineers by 2030.
-              </h1>
-
-              {/* Buttons matching user design */}
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <a
-                  href="#pricing"
-                  className="ds-motion inline-flex h-12 items-center justify-center rounded-full bg-ter-600 px-7 font-body text-base font-semibold text-white shadow-sm hover:bg-ter-700 hover:-translate-y-px"
-                >
-                  Register for the free masterclass
-                </a>
-                <a
-                  href="#curriculum"
-                  className="ds-motion inline-flex h-12 items-center justify-center rounded-full border border-esp-900/40 bg-white/80 px-7 font-body text-base font-semibold text-esp-950 shadow-xs backdrop-blur-sm hover:border-esp-950 hover:bg-white hover:-translate-y-px"
-                >
-                  Explore the curriculum
-                </a>
-              </div>
-            </Reveal>
-
-            {/* Right column left open so all three climbers and the full summit are completely visible */}
-            <div className="hidden lg:block min-h-[200px]" aria-hidden="true" />
-          </div>
-        </div>
-
-        {/* Dark gradient shade in the bottom so white logos and text are clearly visible */}
+        {/* Gradient overlay at the bottom for crisp text, button, and logo contrast */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-esp-975/95 via-esp-975/65 to-transparent sm:h-44 md:h-48"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 via-40% to-transparent"
           aria-hidden="true"
         />
 
-        {/* All partner logos in pure white, placed directly on top of the image */}
-        <div className="absolute inset-x-0 bottom-0 z-20 pb-4 pt-2 sm:pb-6">
-          <p className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white drop-shadow-md sm:text-xs">
+        {/* Text & Button Layer aligned at the bottom, just above the logo bar */}
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col justify-end px-6 pb-24 pt-16 sm:pb-28 md:px-10 md:pb-30 lg:px-14">
+          <Reveal>
+            <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              {/* Headline on bottom-left */}
+              <h1 className="max-w-[700px] text-[1.6rem] font-bold leading-[1.15] tracking-[-0.03em] text-white drop-shadow-md sm:text-[2.1rem] md:text-[2.4rem] lg:text-[2.9rem]">
+                1M+ Forward Deployed Engineers needed by 2030.
+              </h1>
+
+              {/* Button on bottom-right */}
+              <div className="shrink-0 pb-1">
+                <a
+                  href="#pricing"
+                  className="ds-motion inline-flex h-12 items-center justify-center rounded-lg bg-[#db5c4d] px-8 font-body text-base font-semibold text-white shadow-lg transition-all hover:bg-ter-700 hover:shadow-xl hover:-translate-y-px active:scale-95"
+                >
+                  Start your journey today
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Partner logos marquee directly OVER the image at the base */}
+        <div className="absolute inset-x-0 bottom-0 z-20 pb-4 pt-2 sm:pb-5">
+          <p className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-white/90 drop-shadow-md sm:text-xs">
             Built around the tools behind the stack
           </p>
           <div className="mt-2 w-full overflow-hidden py-1">

@@ -16,6 +16,7 @@ import { WallOfLove } from "@/components/fde/WallOfLove";
 import { Faq } from "@/components/fde/Faq";
 import { CtaBand } from "@/components/fde/CtaBand";
 import { SiteFooter } from "@/components/fde/SiteFooter";
+import { StickyMasterclassBar } from "@/components/fde/StickyMasterclassBar";
 
 const title = "The FDE Collective, 1M Forward-Deployed Engineers Needed by 2030 | Lyzr";
 const description =
@@ -51,15 +52,16 @@ function Index() {
         <CareerPath />
         <CurriculumShowcase />
         <InstructorsWall />
+        <WallOfLove />
         <ValueStack />
         <FdeMomentum />
         <EnterpriseProof />
         <PricingDualTier />
-        <WallOfLove />
         <Faq />
         <CtaBand />
       </main>
       <SiteFooter />
+      <StickyMasterclassBar />
     </div>
   );
 }
